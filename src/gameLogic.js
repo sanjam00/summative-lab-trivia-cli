@@ -6,7 +6,7 @@ export async function mainMenu(gameState) {
     console.log(chalk.blue("Time for Trivia!"));
 
     let ready = await select({
-        message: "When ready, select Begin with the arrow keys to start the timer and begin the game!\nYou will have 7 minutes to answer all 5 questions.",
+        message: "When ready, select Begin with the arrow keys to start the timer and begin the game!\nYou will have 5 minutes to answer all 5 questions.",
         choices: [
             { name: "Begin", value: "begin" },
             { name: "Quit", value: "quit" }
@@ -26,7 +26,6 @@ export async function mainMenu(gameState) {
 }
 
 //error with startGame logic. seemingly everything else works. 
-// no matter if the answer is correct or incorrect, the feedback (the if statement) returns "Incorrect"
 //add game is finished message after all questions are complete.
 export async function startGame(gameState) {
 
@@ -40,17 +39,18 @@ export async function startGame(gameState) {
                 value: opt.id
             }))
         })
+        let chosen = question.options.find(opt => opt.id === answer);
+
         updateStats(answer, gameState);
 
-        if (question.options[answer] === true) {
+        if (chosen.isCorrect) {
             console.log(chalk.green("Correct!"));
         } else {
             console.log(chalk.gray("Incorrect answer."));
         }
     }
-
-    showStats(gameState)
-    gameState.over = true;
+    
+    endGame(gameState);
 }
 
 let qAndA = [
@@ -227,28 +227,16 @@ export function updateStats(answer, gameState) {
     }
 }
 
+export function endGame(gameState){
+    //display message that says "You finished the game! Here's your statistics:"
+    console.log(showStats(gameState));
+    //stop timer
+    //display how much time was left or how long the player took to finish the game
+    //do I need to integrate startTimer or change the clearInterval logic within startTimer?
+}
+
 export function showStats(gameState) {
-    console.log(chalk.blue.underline("Game Statistics:"));
+    console.log(chalk.gray.underline("Game Statistics:"));
     console.log(chalk.green(`Correct answers: ${gameState.stats.wins}`));
     console.log(chalk.red(`Incorrect answers: ${gameState.stats.losses}`));
 }
-
-// $ node bin/index.js 
-// Time for Trivia!
-// ✔ When ready, select Begin with the arrow keys to start the timer and begin the game!
-// You will have 7 minutes to answer all 5 questions. Begin
-// You have 5 minutes left!
-// ✔ How many brains does an octopus have? 5
-// Incorrect answer.
-// ✔ How many bones are in the human body? 206
-// Incorrect answer.
-// ✔ What was the name of the first computer virus? Creeper
-// Incorrect answer.
-// ✔ Who is the director of the critically acclaimed film “Parasite”? Park Chan-wook
-// Incorrect answer.
-// ✔ How many hearts does an octopus have? 3
-// Incorrect answer.
-// Game Statistics:
-// Correct answers: 0
-// Incorrect answers: 5
-// 3 minutes remaining.
