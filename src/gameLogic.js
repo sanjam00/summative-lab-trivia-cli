@@ -6,7 +6,7 @@ export async function mainMenu(gameState) {
     console.log(chalk.blue("Time for Trivia!"));
 
     let ready = await select({
-        message: "When ready, select Begin with the arrow keys to start the timer and begin the game!\nYou will have 5 minutes to answer all 5 questions.",
+        message: "When ready, select Begin with the arrow keys to start the timer and begin the game!\nYou will have 3 minutes to answer all 5 questions.",
         choices: [
             { name: "Begin", value: "begin" },
             { name: "Quit", value: "quit" }
@@ -186,14 +186,16 @@ let qAndA = [
     },
 ];
 
-const totalTime = 5 * 60;
+const interval;
+const totalTime = 3 * 60;
 export function startTimer(gameState) {
 
     let timeLeft = totalTime;
 
     console.log(chalk.yellow(`You have ${totalTime / 60} minutes left!`));
 
-    const interval = setInterval(() => {
+    //new change to use interval in endGame
+    interval = setInterval(() => {
         timeLeft--;
 
         if (timeLeft === 300) console.log(chalk.magenta("5 minutes remaining."));
@@ -229,9 +231,13 @@ export function updateStats(answer, gameState) {
 
 export function endGame(gameState){
     //display message that says "You finished the game! Here's your statistics:"
+    console.log(chalk.bold("You finished the game! Here's your statistics: "))
     console.log(showStats(gameState));
-    //stop timer
-    //display how much time was left or how long the player took to finish the game
+    interval = clearInterval(() => {
+        //hopefully will stop the setInterval function stored within interval variable
+    })
+    //display how much time was left if they finished or how long the player took to finish the game
+    
     //do I need to integrate startTimer or change the clearInterval logic within startTimer?
 }
 
