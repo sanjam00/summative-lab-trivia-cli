@@ -25,7 +25,9 @@ export async function mainMenu(gameState) {
     return ready;
 }
 
-//error with startGame logic. seemingly everything else works
+//error with startGame logic. seemingly everything else works. 
+// no matter if the answer is correct or incorrect, the feedback (the if statement) returns "Incorrect"
+//add game is finished message after all questions are complete.
 export async function startGame(gameState) {
 
     startTimer(gameState);
@@ -43,7 +45,7 @@ export async function startGame(gameState) {
         if (question.options[answer] === true) {
             console.log(chalk.green("Correct!"));
         } else {
-            console.log(chalk.red("Incorrect answer."));
+            console.log(chalk.gray("Incorrect answer."));
         }
     }
 
@@ -226,7 +228,27 @@ export function updateStats(answer, gameState) {
 }
 
 export function showStats(gameState) {
-    console.log(chalk.blue("Game Statistics:"));
+    console.log(chalk.blue.underline("Game Statistics:"));
     console.log(chalk.green(`Correct answers: ${gameState.stats.wins}`));
     console.log(chalk.red(`Incorrect answers: ${gameState.stats.losses}`));
 }
+
+// $ node bin/index.js 
+// Time for Trivia!
+// ✔ When ready, select Begin with the arrow keys to start the timer and begin the game!
+// You will have 7 minutes to answer all 5 questions. Begin
+// You have 5 minutes left!
+// ✔ How many brains does an octopus have? 5
+// Incorrect answer.
+// ✔ How many bones are in the human body? 206
+// Incorrect answer.
+// ✔ What was the name of the first computer virus? Creeper
+// Incorrect answer.
+// ✔ Who is the director of the critically acclaimed film “Parasite”? Park Chan-wook
+// Incorrect answer.
+// ✔ How many hearts does an octopus have? 3
+// Incorrect answer.
+// Game Statistics:
+// Correct answers: 0
+// Incorrect answers: 5
+// 3 minutes remaining.
