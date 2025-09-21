@@ -4,7 +4,8 @@ const gameState = {
         losses: 0,
     },
     over: false,
-    totalQuestions: 5
+    totalQuestions: 5,
+    startTime: null
 };
 
 export default gameState;

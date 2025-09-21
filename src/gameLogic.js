@@ -1,7 +1,9 @@
 import chalk from "chalk";
 import { select } from "@inquirer/prompts";
+import {startTimer, endGame } from "./timer.js";
 
 export async function mainMenu(gameState) {
+    //displays main menu, allows player to exit or continue
 
     console.log(chalk.blue("Time for Trivia!"));
 
@@ -25,13 +27,15 @@ export async function mainMenu(gameState) {
     return ready;
 }
 
-//error with startGame logic. seemingly everything else works. 
-//add game is finished message after all questions are complete.
 export async function startGame(gameState) {
 
     startTimer(gameState);
 
     for (let question of qAndA) {
+        //if time runs out, don't repeat questions
+        if (gameState.over) break;
+
+        //loops through each question, determines T or F
         let answer = await select({
             message: question.question,
             choices: question.options.map(opt => ({
@@ -41,18 +45,20 @@ export async function startGame(gameState) {
         })
         let chosen = question.options.find(opt => opt.id === answer);
 
-        updateStats(answer, gameState);
-
         if (chosen.isCorrect) {
             console.log(chalk.green("Correct!"));
+            updateStats(chosen, gameState);
         } else {
-            console.log(chalk.gray("Incorrect answer."));
+            console.log(chalk.yellow("Incorrect answer."));
+            updateStats(chosen, gameState);
         }
     }
-    
+
     endGame(gameState);
+    gameState.over = true;
 }
 
+//stores questions
 let qAndA = [
     {
         "id": 1,
@@ -186,63 +192,16 @@ let qAndA = [
     },
 ];
 
-const interval;
-const totalTime = 3 * 60;
-export function startTimer(gameState) {
-
-    let timeLeft = totalTime;
-
-    console.log(chalk.yellow(`You have ${totalTime / 60} minutes left!`));
-
-    //new change to use interval in endGame
-    interval = setInterval(() => {
-        timeLeft--;
-
-        if (timeLeft === 300) console.log(chalk.magenta("5 minutes remaining."));
-        if (timeLeft === 180) console.log(chalk.magenta("3 minutes remaining."));
-        if (timeLeft === 60) console.log(chalk.magenta("1 minute remaining"))
-
-        if (timeLeft < 0) {
-            clearInterval(interval);
-            console.log(chalk.red.bold(`Time's up! The game is over.`));
-
-            const answered = gameState.stats.wins + gameState.stats.losses;
-            const unanswered = gameState.totalQuestions - answered;
-
-            gameState.stats.losses += unanswered;
-            gameState.over = true;
-
-            showStats(gameState);
-        }
-    }, 1000);
-
-    return interval;
-}
-
-//the value of answer will be boolean yes? therefore should work as a parameter?
-//create updatesstats and pass boolean as result. if boolean is tru update stats to 1
-export function updateStats(answer, gameState) {
-    if (answer === true) {
+export function updateStats(chosen, gameState) {
+    if (chosen.isCorrect) {
         gameState.stats.wins += 1;
     } else {
         gameState.stats.losses += 1;
     }
 }
 
-export function endGame(gameState){
-    //display message that says "You finished the game! Here's your statistics:"
-    console.log(chalk.bold("You finished the game! Here's your statistics: "))
-    console.log(showStats(gameState));
-    interval = clearInterval(() => {
-        //hopefully will stop the setInterval function stored within interval variable
-    })
-    //display how much time was left if they finished or how long the player took to finish the game
-    
-    //do I need to integrate startTimer or change the clearInterval logic within startTimer?
-}
-
 export function showStats(gameState) {
-    console.log(chalk.gray.underline("Game Statistics:"));
+    console.log(chalk.gray.underline("\nGame Statistics:"));
     console.log(chalk.green(`Correct answers: ${gameState.stats.wins}`));
     console.log(chalk.red(`Incorrect answers: ${gameState.stats.losses}`));
 }
